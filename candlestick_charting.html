@@ -1,0 +1,2886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMT Candlestick Charting — Complete Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0d0f;
+  --bg2: #111417;
+  --bg3: #181c20;
+  --bg4: #1e2329;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e6e1;
+  --text2: #9b9590;
+  --text3: #5c5852;
+  --accent: #c9a84c;
+  --accent2: #a07830;
+  --bull: #26a69a;
+  --bull2: #1a7a70;
+  --bull3: rgba(38,166,154,0.12);
+  --bear: #ef5350;
+  --bear2: #c62828;
+  --bear3: rgba(239,83,80,0.12);
+  --neutral: #8b9db0;
+  --neutral2: rgba(139,157,176,0.15);
+  --gold: #c9a84c;
+  --serif: 'Playfair Display', Georgia, serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --body: 'Source Serif 4', Georgia, serif;
+  --nav-w: 260px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ─── SCROLLBAR ─────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ─── SIDE NAV ───────────────────────────────── */
+#sidenav {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--nav-w);
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 32px 0 40px;
+}
+
+.nav-logo {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.nav-logo .badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  padding: 2px 7px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.nav-logo h1 {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.nav-section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--text3);
+  padding: 16px 24px 6px;
+  text-transform: uppercase;
+}
+
+#sidenav a {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text2);
+  padding: 7px 24px;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+#sidenav a:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+}
+
+#sidenav a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(201,168,76,0.06);
+}
+
+/* ─── MAIN CONTENT ───────────────────────────── */
+#main {
+  margin-left: var(--nav-w);
+  padding: 0 64px 120px;
+  max-width: calc(var(--nav-w) + 900px);
+}
+
+/* ─── HERO ───────────────────────────────────── */
+#hero {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-badge::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+#hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 20px;
+  max-width: 700px;
+}
+
+#hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+#hero p {
+  color: var(--text2);
+  font-size: 17px;
+  max-width: 560px;
+  line-height: 1.8;
+}
+
+.hero-meta {
+  margin-top: 32px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-stat .val {
+  font-family: var(--mono);
+  font-size: 22px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.hero-stat .lbl {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+/* ─── SECTIONS ───────────────────────────────── */
+section {
+  padding: 64px 0 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+section:last-child { border-bottom: none; }
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+section h2 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+section h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 36px 0 12px;
+}
+
+section h4 {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin: 24px 0 8px;
+}
+
+section p {
+  color: var(--text2);
+  margin-bottom: 14px;
+  max-width: 680px;
+}
+
+section ul, section ol {
+  color: var(--text2);
+  padding-left: 20px;
+  max-width: 680px;
+  margin-bottom: 14px;
+}
+
+section li { margin-bottom: 5px; }
+
+.section-intro {
+  color: var(--text2);
+  font-size: 16px;
+  max-width: 640px;
+  margin-bottom: 36px;
+  border-left: 2px solid var(--accent2);
+  padding-left: 16px;
+}
+
+/* ─── CALLOUT BOXES ──────────────────────────── */
+.callout {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+  max-width: 700px;
+}
+
+.callout.bull { border-color: rgba(38,166,154,0.3); background: rgba(38,166,154,0.04); }
+.callout.bear { border-color: rgba(239,83,80,0.3); background: rgba(239,83,80,0.04); }
+.callout.gold { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.04); }
+
+.callout-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.callout.bull .callout-label { color: var(--bull); }
+.callout.bear .callout-label { color: var(--bear); }
+.callout.gold .callout-label { color: var(--accent); }
+
+.callout p { margin: 0; font-size: 14px; max-width: none; }
+
+/* ─── ANATOMY DIAGRAM ────────────────────────── */
+.anatomy-wrap {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  margin: 32px 0;
+  flex-wrap: wrap;
+}
+
+/* ─── CANDLE SVG COMPONENTS ──────────────────── */
+.candle-svg-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 120px;
+}
+
+.candle-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* ─── PATTERN CARDS ──────────────────────────── */
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.pattern-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.pattern-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.pattern-card.bull::after { background: var(--bull3); }
+.pattern-card.bear::after { background: var(--bear3); }
+.pattern-card.neutral::after { background: var(--neutral2); }
+
+.pattern-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.pattern-card:hover::after { opacity: 1; }
+
+.pattern-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pattern-card-title {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pattern-card-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.bull .pattern-card-tag { color: var(--bull); background: var(--bull3); border: 1px solid rgba(38,166,154,0.3); }
+.bear .pattern-card-tag { color: var(--bear); background: var(--bear3); border: 1px solid rgba(239,83,80,0.3); }
+.neutral .pattern-card-tag { color: var(--neutral); background: var(--neutral2); border: 1px solid rgba(139,157,176,0.3); }
+
+.pattern-card-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.pattern-card-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pattern-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pattern-meta-item .key {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pattern-meta-item .val {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* reliability bar */
+.rel-bar-wrap {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rel-bar-bg {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rel-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.bull .rel-bar-fill { background: var(--bull); }
+.bear .rel-bar-fill { background: var(--bear); }
+.neutral .rel-bar-fill { background: var(--neutral); }
+
+.rel-pct {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  min-width: 32px;
+}
+
+/* ─── INTERACTIVE CANDLESTICK BUILDER ────────── */
+#builder-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin: 32px 0;
+  max-width: 720px;
+}
+
+.builder-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.builder-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ctrl-group label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+.ctrl-group input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: var(--border2);
+  border-radius: 2px;
+  outline: none;
+}
+
+.ctrl-group input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.ctrl-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.builder-output {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.builder-info {
+  text-align: center;
+}
+
+.builder-info .pattern-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.builder-info .pattern-type {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ─── FULL PATTERN EXPLORER ──────────────────── */
+#explorer {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 32px 0;
+  max-width: 800px;
+}
+
+.explorer-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+  overflow-x: auto;
+}
+
+.explorer-tab {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.explorer-tab:hover { color: var(--text2); }
+.explorer-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.explorer-panel {
+  display: none;
+  padding: 28px;
+}
+
+.explorer-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+
+.explorer-visual { display: flex; justify-content: center; }
+.explorer-detail { }
+
+.explorer-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.explorer-japanese {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+.explorer-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.explorer-rules-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.explorer-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.rule-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+.bull-dot { background: var(--bull); }
+.bear-dot { background: var(--bear); }
+.neutral-dot { background: var(--neutral); }
+
+.explorer-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.stat-box {
+  background: var(--bg4);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.stat-box .key {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.stat-box .val {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* ─── SIMULATED CHART ────────────────────────── */
+.chart-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 24px 0;
+  position: relative;
+}
+
+.chart-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* ─── STRATEGY TABLE ─────────────────────────── */
+.strategy-table {
+  width: 100%;
+  max-width: 720px;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 13px;
+}
+
+.strategy-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.strategy-table td {
+  color: var(--text2);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.strategy-table tr:last-child td { border-bottom: none; }
+.strategy-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ─── QUIZ ───────────────────────────────────── */
+#quiz-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 680px;
+  margin: 32px 0;
+}
+
+.quiz-q {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quiz-opt {
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.quiz-opt:hover { border-color: var(--border2); color: var(--text); }
+.quiz-opt.correct { border-color: var(--bull); background: var(--bull3); color: var(--bull); }
+.quiz-opt.wrong { border-color: var(--bear); background: var(--bear3); color: var(--bear); }
+
+.quiz-feedback {
+  font-size: 14px;
+  color: var(--text2);
+  padding: 12px 16px;
+  background: var(--bg4);
+  border-radius: 7px;
+  border-left: 3px solid var(--accent);
+  display: none;
+  line-height: 1.6;
+}
+
+.quiz-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 9px 18px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+.btn-primary:hover { background: var(--accent2); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.quiz-progress {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-left: auto;
+}
+
+/* ─── MARKET CONTEXT GRID ────────────────────── */
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+  max-width: 700px;
+}
+
+.context-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.context-card-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.context-card-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.context-card-text {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ─── TIMELINE ───────────────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin: 24px 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border2);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent2);
+  border: 1px solid var(--accent);
+}
+
+.timeline-date {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.timeline-text {
+  font-size: 14px;
+  color: var(--text2);
+}
+
+/* ─── FILTER CHIPS ───────────────────────────── */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.chip:hover { color: var(--text2); border-color: var(--text3); }
+.chip.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+/* ─── MINI CHART EXAMPLES ────────────────────── */
+.mini-chart-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.mini-chart-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-chart-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  text-align: center;
+}
+
+/* ─── COMBINATION TABLE ──────────────────────── */
+.combo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 720px;
+  margin: 24px 0;
+}
+
+.combo-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.combo-card h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  margin: 0 0 8px;
+}
+
+.combo-card p {
+  font-size: 13px;
+  margin: 0;
+  max-width: none;
+}
+
+/* ─── RISK SECTION ───────────────────────────── */
+.risk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  max-width: 700px;
+  margin: 24px 0;
+}
+
+.risk-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.risk-card .num {
+  font-family: var(--mono);
+  font-size: 28px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.risk-card .label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.risk-card .desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 900px) {
+  :root { --nav-w: 220px; }
+  #main { padding: 0 32px 80px; }
+}
+
+@media (max-width: 700px) {
+  #sidenav { display: none; }
+  #main { margin-left: 0; padding: 0 20px 60px; }
+  .builder-grid, .explorer-panel.active { grid-template-columns: 1fr; }
+  .context-grid, .risk-grid { grid-template-columns: 1fr 1fr; }
+  .combo-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── ANIMATIONS ─────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeInUp 0.5s ease both; }
+
+/* ─── SCROLL PROGRESS ────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 200;
+  transition: width 0.1s;
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- SIDE NAVIGATION -->
+<nav id="sidenav">
+  <div class="nav-logo">
+    <div class="badge">CMT Reference</div>
+    <h1>Candlestick<br>Charting Guide</h1>
+  </div>
+
+  <div class="nav-section-label">Foundations</div>
+  <a href="#history">History &amp; Origins</a>
+  <a href="#anatomy">Candle Anatomy</a>
+  <a href="#reading">Reading Candles</a>
+  <a href="#builder">Interactive Builder</a>
+
+  <div class="nav-section-label">Single Candle</div>
+  <a href="#marubozu">Marubozu</a>
+  <a href="#doji">Doji Family</a>
+  <a href="#spinning">Spinning Top</a>
+  <a href="#hammer">Hammer / Hanging Man</a>
+  <a href="#shooting">Shooting Star</a>
+
+  <div class="nav-section-label">Two-Candle</div>
+  <a href="#engulfing">Engulfing</a>
+  <a href="#harami">Harami</a>
+  <a href="#piercing">Piercing / Dark Cloud</a>
+  <a href="#tweezers">Tweezers</a>
+  <a href="#kicker">Kicker</a>
+
+  <div class="nav-section-label">Three-Candle</div>
+  <a href="#morning-star">Morning / Evening Star</a>
+  <a href="#three-soldiers">Three Soldiers / Crows</a>
+  <a href="#three-inside">Three Inside</a>
+  <a href="#abandoned">Abandoned Baby</a>
+  <a href="#rising-falling">Rising / Falling Three</a>
+
+  <div class="nav-section-label">Advanced</div>
+  <a href="#psychology">Market Psychology</a>
+  <a href="#context">Market Context</a>
+  <a href="#combinations">With Indicators</a>
+  <a href="#timeframes">Multi-Timeframe</a>
+  <a href="#risk">Risk Management</a>
+  <a href="#common-errors">Common Errors</a>
+  <a href="#quiz">Knowledge Quiz</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════ -->
+<div id="hero">
+  <div class="hero-badge">CMT PRACTITIONER GUIDE · TECHNICAL ANALYSIS</div>
+  <h1>The Complete Guide to<br><em>Candlestick Charting</em></h1>
+  <p>From 18th-century Japanese rice markets to modern algorithmic trading desks — a practitioner-level reference covering anatomy, psychology, patterns, and strategy.</p>
+  <div class="hero-meta">
+    <div class="hero-stat"><span class="val">40+</span><span class="lbl">Patterns Covered</span></div>
+    <div class="hero-stat"><span class="val">300+</span><span class="lbl">Years of History</span></div>
+    <div class="hero-stat"><span class="val">CMT</span><span class="lbl">Level I–II Aligned</span></div>
+    <div class="hero-stat"><span class="val">Interactive</span><span class="lbl">Visual Examples</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 1: HISTORY
+═══════════════════════════════════════════════════════════ -->
+<section id="history">
+  <div class="section-num">01 / FOUNDATIONS</div>
+  <h2>History &amp; Origins</h2>
+  <p class="section-intro">Candlestick charting is the oldest surviving form of technical analysis — predating Western bar charts by over a century.</p>
+
+  <p>In the early 1700s, a Japanese rice merchant named <strong style="color:var(--text)">Munehisa Homma</strong> (本間宗久) observed that rice prices were driven not only by supply and demand, but by the emotional states of traders — fear, greed, and indecision. He began recording price movements in a visual format that captured the open, high, low, and close of each trading session, creating what we now call the candlestick chart.</p>
+
+  <p>Homma is said to have completed over 100 consecutive winning trades using his method, amassing a fortune equivalent to hundreds of millions of dollars in today's terms. His insights were published in two works: <em>Sakata Senho</em> (Rules of Sakata) and <em>Soba Sani No Den</em> (The Fountain of Gold).</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">~1700s</div>
+      <div class="timeline-text">Munehisa Homma develops the candlestick method for the Dojima Rice Exchange in Osaka, Japan.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1700–1867</div>
+      <div class="timeline-text">The Tokugawa Shogunate era. Candlestick terminology draws heavily from military strategy — "three white soldiers," "gravestone," "counterattack lines."</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1989</div>
+      <div class="timeline-text">Steve Nison publishes his landmark article introducing candlestick charting to Western markets, triggering immediate widespread adoption.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">1991</div>
+      <div class="timeline-text"><em>Japanese Candlestick Charting Techniques</em> is published — the definitive Western reference text, now required reading for the CMT program.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Today</div>
+      <div class="timeline-text">Virtually every charting platform defaults to candlestick charts. The method is core to the CMT Body of Knowledge and is used across all asset classes globally.</div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-label">CMT Principle</div>
+    <p>The CMT Association emphasizes that candlestick patterns reflect <em>market psychology in action</em>. Each pattern is a visual record of the battle between buyers and sellers within a defined time period. Patterns must always be interpreted in the context of the prevailing trend and surrounding price structure.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 2: ANATOMY
+═══════════════════════════════════════════════════════════ -->
+<section id="anatomy">
+  <div class="section-num">02 / FOUNDATIONS</div>
+  <h2>Candle Anatomy</h2>
+  <p class="section-intro">Every candlestick encodes four data points — open, high, low, close (OHLC) — into a single visual element.</p>
+
+  <!-- Anatomy SVG -->
+  <div style="margin: 32px 0; overflow-x: auto;">
+    <svg width="680" height="380" viewBox="0 0 680 380" style="max-width:100%; display:block;">
+      <defs>
+        <marker id="arr-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+        <marker id="arr-bull" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#26a69a" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+        <marker id="arr-bear" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#ef5350" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+
+      <!-- BULLISH CANDLE (left) -->
+      <!-- Upper wick -->
+      <line x1="160" y1="50" x2="160" y2="110" stroke="#26a69a" stroke-width="2"/>
+      <!-- Body -->
+      <rect x="135" y="110" width="50" height="120" rx="3" fill="#26a69a" opacity="0.85"/>
+      <!-- Lower wick -->
+      <line x1="160" y1="230" x2="160" y2="290" stroke="#26a69a" stroke-width="2"/>
+
+      <!-- Bullish labels -->
+      <line x1="170" y1="50" x2="240" y2="50" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="245" y="54" font-family="IBM Plex Mono" font-size="11" fill="#c9a84c">HIGH</text>
+      <text x="245" y="68" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Upper shadow / wick)</text>
+
+      <line x1="186" y1="110" x2="240" y2="110" stroke="#26a69a" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="245" y="114" font-family="IBM Plex Mono" font-size="11" fill="#26a69a">OPEN</text>
+      <text x="245" y="128" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Bottom of body = open)</text>
+
+      <line x1="105" y1="170" x2="60" y2="170" stroke="#9b9590" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="10" y="164" font-family="IBM Plex Mono" font-size="9" fill="#9b9590">REAL</text>
+      <text x="10" y="176" font-family="IBM Plex Mono" font-size="9" fill="#9b9590">BODY</text>
+
+      <line x1="186" y1="230" x2="240" y2="230" stroke="#26a69a" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="245" y="234" font-family="IBM Plex Mono" font-size="11" fill="#26a69a">CLOSE</text>
+      <text x="245" y="248" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Top of body = close)</text>
+
+      <line x1="170" y1="290" x2="240" y2="290" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="245" y="294" font-family="IBM Plex Mono" font-size="11" fill="#c9a84c">LOW</text>
+      <text x="245" y="308" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Lower shadow / wick)</text>
+
+      <text x="160" y="340" font-family="IBM Plex Mono" font-size="10" fill="#26a69a" text-anchor="middle">BULLISH CANDLE</text>
+      <text x="160" y="354" font-family="IBM Plex Mono" font-size="9" fill="#5c5852" text-anchor="middle">Close &gt; Open</text>
+
+      <!-- BEARISH CANDLE (right) -->
+      <line x1="520" y1="50" x2="520" y2="110" stroke="#ef5350" stroke-width="2"/>
+      <rect x="495" y="110" width="50" height="120" rx="3" fill="#ef5350" opacity="0.85"/>
+      <line x1="520" y1="230" x2="520" y2="290" stroke="#ef5350" stroke-width="2"/>
+
+      <!-- Bearish labels (left side) -->
+      <line x1="494" y1="50" x2="450" y2="50" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="340" y="54" font-family="IBM Plex Mono" font-size="11" fill="#c9a84c">HIGH</text>
+
+      <line x1="494" y1="110" x2="450" y2="110" stroke="#ef5350" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="330" y="114" font-family="IBM Plex Mono" font-size="11" fill="#ef5350">OPEN</text>
+      <text x="330" y="128" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Top of body = open)</text>
+
+      <line x1="494" y1="230" x2="450" y2="230" stroke="#ef5350" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="325" y="234" font-family="IBM Plex Mono" font-size="11" fill="#ef5350">CLOSE</text>
+      <text x="325" y="248" font-family="IBM Plex Mono" font-size="9" fill="#5c5852">(Bottom of body = close)</text>
+
+      <line x1="494" y1="290" x2="450" y2="290" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="4 3"/>
+      <text x="350" y="294" font-family="IBM Plex Mono" font-size="11" fill="#c9a84c">LOW</text>
+
+      <text x="520" y="340" font-family="IBM Plex Mono" font-size="10" fill="#ef5350" text-anchor="middle">BEARISH CANDLE</text>
+      <text x="520" y="354" font-family="IBM Plex Mono" font-size="9" fill="#5c5852" text-anchor="middle">Close &lt; Open</text>
+
+      <!-- Bracket for body on bullish -->
+      <line x1="100" y1="110" x2="100" y2="230" stroke="#9b9590" stroke-width="0.8" opacity="0.5"/>
+      <line x1="100" y1="110" x2="110" y2="110" stroke="#9b9590" stroke-width="0.8" opacity="0.5"/>
+      <line x1="100" y1="230" x2="110" y2="230" stroke="#9b9590" stroke-width="0.8" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <h3>The Four Price Points</h3>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:680px; margin-bottom:24px;">
+    <div class="stat-box">
+      <div class="key">Open</div>
+      <div class="val" style="color:var(--text2);font-size:13px;margin-top:4px;">First traded price of the period. In a bullish candle, this is the bottom of the body. In bearish, the top.</div>
+    </div>
+    <div class="stat-box">
+      <div class="key">High</div>
+      <div class="val" style="color:var(--text2);font-size:13px;margin-top:4px;">Highest price reached. The tip of the upper shadow. Represents maximum intraperiod bullish pressure.</div>
+    </div>
+    <div class="stat-box">
+      <div class="key">Low</div>
+      <div class="val" style="color:var(--text2);font-size:13px;margin-top:4px;">Lowest price reached. The tip of the lower shadow. Represents maximum intraperiod bearish pressure.</div>
+    </div>
+    <div class="stat-box">
+      <div class="key">Close</div>
+      <div class="val" style="color:var(--text2);font-size:13px;margin-top:4px;">Final traded price. The most important of the four — it reflects the market's final verdict for the period.</div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-label">CMT Key Principle</div>
+    <p>The <strong style="color:var(--text)">close</strong> is the most psychologically significant price point. Many institutional trading systems (moving averages, breakout confirmations) are based on closing prices. The Japanese called late-session manipulation of the close a <em>"night attack"</em> — a deliberate strategy to influence the candlestick's final appearance.</p>
+  </div>
+
+  <h3>Shadow Interpretation</h3>
+  <p>The length and position of shadows carry critical information about intraperiod battles between bulls and bears:</p>
+  <ul>
+    <li><strong style="color:var(--text)">Long upper shadow</strong> — Buyers drove price high, but sellers rejected the advance. Bearish implication.</li>
+    <li><strong style="color:var(--text)">Long lower shadow</strong> — Sellers drove price down, but buyers absorbed all supply and recovered. Bullish implication.</li>
+    <li><strong style="color:var(--text)">No shadows (Marubozu)</strong> — One side dominated the entire session without any meaningful counterattack.</li>
+    <li><strong style="color:var(--text)">Equal shadows</strong> — Market indecision; neither side could maintain an advantage.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 3: READING CANDLES
+═══════════════════════════════════════════════════════════ -->
+<section id="reading">
+  <div class="section-num">03 / FOUNDATIONS</div>
+  <h2>Reading Candles</h2>
+  <p class="section-intro">Individual candles tell a story of intraperiod psychology. The key is reading the narrative, not just the shape.</p>
+
+  <h3>Body Size Matters</h3>
+  <div class="mini-chart-row">
+    <div class="mini-chart-box">
+      <svg width="30" height="100" viewBox="0 0 30 100">
+        <line x1="15" y1="5" x2="15" y2="15" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="5" y="15" width="20" height="78" rx="2" fill="#26a69a" opacity="0.85"/>
+        <line x1="15" y1="93" x2="15" y2="98" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div class="mini-chart-title">Long Bull<br><span style="color:var(--bull)">Strong buying</span></div>
+    </div>
+    <div class="mini-chart-box">
+      <svg width="30" height="100" viewBox="0 0 30 100">
+        <line x1="15" y1="5" x2="15" y2="15" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="5" y="15" width="20" height="78" rx="2" fill="#ef5350" opacity="0.85"/>
+        <line x1="15" y1="93" x2="15" y2="98" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div class="mini-chart-title">Long Bear<br><span style="color:var(--bear)">Strong selling</span></div>
+    </div>
+    <div class="mini-chart-box">
+      <svg width="30" height="100" viewBox="0 0 30 100">
+        <line x1="15" y1="30" x2="15" y2="44" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="5" y="44" width="20" height="14" rx="2" fill="#26a69a" opacity="0.85"/>
+        <line x1="15" y1="58" x2="15" y2="72" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div class="mini-chart-title">Small Body<br><span style="color:var(--neutral)">Indecision</span></div>
+    </div>
+    <div class="mini-chart-box">
+      <svg width="30" height="100" viewBox="0 0 30 100">
+        <line x1="15" y1="5" x2="15" y2="48" stroke="#9b9590" stroke-width="1.5"/>
+        <line x1="5" y1="50" x2="25" y2="50" stroke="#9b9590" stroke-width="2.5"/>
+        <line x1="15" y1="52" x2="15" y2="95" stroke="#9b9590" stroke-width="1.5"/>
+      </svg>
+      <div class="mini-chart-title">Doji<br><span style="color:var(--neutral)">Pure indecision</span></div>
+    </div>
+    <div class="mini-chart-box">
+      <svg width="30" height="100" viewBox="0 0 30 100">
+        <line x1="15" y1="5" x2="15" y2="44" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="5" y="44" width="20" height="18" rx="2" fill="#26a69a" opacity="0.85"/>
+        <line x1="15" y1="62" x2="15" y2="95" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div class="mini-chart-title">Spinning Top<br><span style="color:var(--neutral)">Weak signal</span></div>
+    </div>
+  </div>
+
+  <h3>Timeframe Considerations</h3>
+  <p>Every candlestick represents one complete period of price action. A daily candle captures the entire trading session; a 5-minute candle captures only those five minutes. The same pattern on a weekly chart carries far more weight than on a 1-minute chart because it represents more collective decision-making and has been tested by more market participants.</p>
+
+  <div class="context-grid">
+    <div class="context-card">
+      <div class="context-card-icon">📅</div>
+      <div class="context-card-title">Weekly / Monthly</div>
+      <div class="context-card-text">Institutional-grade signals. Fewer false positives. Primary trend identification.</div>
+    </div>
+    <div class="context-card">
+      <div class="context-card-icon">📆</div>
+      <div class="context-card-title">Daily</div>
+      <div class="context-card-text">Most widely followed. Swing trade entries and exits. Core CMT analysis timeframe.</div>
+    </div>
+    <div class="context-card">
+      <div class="context-card-icon">⏱</div>
+      <div class="context-card-title">Intraday (5m–60m)</div>
+      <div class="context-card-text">Higher noise ratio. Patterns require volume confirmation. Best in trend context.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 4: INTERACTIVE BUILDER
+═══════════════════════════════════════════════════════════ -->
+<section id="builder">
+  <div class="section-num">04 / FOUNDATIONS</div>
+  <h2>Interactive Candle Builder</h2>
+  <p class="section-intro">Adjust the sliders to construct any candlestick and see how the OHLC relationship creates different patterns.</p>
+
+  <div id="builder-wrap">
+    <div class="builder-grid">
+      <div class="builder-controls">
+        <div class="ctrl-group">
+          <label>Open <span class="ctrl-val" id="lbl-open">50</span></label>
+          <input type="range" id="sl-open" min="10" max="90" value="50" oninput="updateBuilder()">
+        </div>
+        <div class="ctrl-group">
+          <label>Close <span class="ctrl-val" id="lbl-close">70</span></label>
+          <input type="range" id="sl-close" min="10" max="90" value="70" oninput="updateBuilder()">
+        </div>
+        <div class="ctrl-group">
+          <label>High <span class="ctrl-val" id="lbl-high">80</span></label>
+          <input type="range" id="sl-high" min="10" max="100" value="80" oninput="updateBuilder()">
+        </div>
+        <div class="ctrl-group">
+          <label>Low <span class="ctrl-val" id="lbl-low">30</span></label>
+          <input type="range" id="sl-low" min="0" max="90" value="30" oninput="updateBuilder()">
+        </div>
+      </div>
+      <div class="builder-output">
+        <svg id="builder-svg" width="100" height="200" viewBox="0 0 100 200"></svg>
+        <div class="builder-info">
+          <div class="pattern-name" id="builder-name">Bullish Candle</div>
+          <div class="pattern-type" id="builder-type" style="color:var(--bull)">BULLISH</div>
+        </div>
+      </div>
+    </div>
+    <div id="builder-analysis" style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border); font-size:13px; color:var(--text2); line-height:1.7;"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 5: MARUBOZU
+═══════════════════════════════════════════════════════════ -->
+<section id="marubozu">
+  <div class="section-num">05 / SINGLE CANDLE</div>
+  <h2>Marubozu</h2>
+  <p class="section-intro">The strongest single-candle signal. A full body with no shadows means one side controlled the session from open to close without a meaningful counterattack.</p>
+
+  <div id="explorer" style="margin-top:0;">
+    <div class="explorer-tabs">
+      <div class="explorer-tab active" onclick="showTab('mar','bull-mar')">Bull Marubozu</div>
+      <div class="explorer-tab" onclick="showTab('mar','bear-mar')">Bear Marubozu</div>
+      <div class="explorer-tab" onclick="showTab('mar','open-mar')">Opening Marubozu</div>
+      <div class="explorer-tab" onclick="showTab('mar','close-mar')">Closing Marubozu</div>
+    </div>
+    <div id="bull-mar" class="explorer-panel active">
+      <div class="explorer-visual">
+        <svg width="120" height="200" viewBox="0 0 120 200">
+          <rect x="45" y="30" width="30" height="140" rx="3" fill="#26a69a" opacity="0.9"/>
+          <text x="60" y="20" font-family="IBM Plex Mono" font-size="9" fill="#26a69a" text-anchor="middle">CLOSE</text>
+          <text x="60" y="185" font-family="IBM Plex Mono" font-size="9" fill="#26a69a" text-anchor="middle">OPEN</text>
+        </svg>
+      </div>
+      <div class="explorer-detail">
+        <div class="explorer-name">Bullish Marubozu</div>
+        <div class="explorer-japanese">丸坊主 (Marubozu) · "Shaved Head"</div>
+        <div class="explorer-desc">A long green body with no upper or lower shadows. Buyers completely dominated from the opening tick to the closing tick. The open is the low; the close is the high. This is one of the most powerful bullish signals in candlestick analysis.</div>
+        <div class="explorer-rules-title">Formation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>No upper shadow (or negligible)</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>No lower shadow (or negligible)</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Body spans from open (low) to close (high)</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Most powerful after a consolidation or at breakout</div>
+        </div>
+        <div class="explorer-stats">
+          <div class="stat-box"><div class="key">Signal Type</div><div class="val" style="color:var(--bull);font-size:12px;">Bullish Continuation/Reversal</div></div>
+          <div class="stat-box"><div class="key">Reliability</div><div class="val" style="color:var(--bull);font-size:12px;">65–70% (trending)</div></div>
+          <div class="stat-box"><div class="key">Candles</div><div class="val" style="font-size:12px;">Single</div></div>
+          <div class="stat-box"><div class="key">Confirmation</div><div class="val" style="font-size:12px;">Volume spike ideal</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="bear-mar" class="explorer-panel">
+      <div class="explorer-visual">
+        <svg width="120" height="200" viewBox="0 0 120 200">
+          <rect x="45" y="30" width="30" height="140" rx="3" fill="#ef5350" opacity="0.9"/>
+          <text x="60" y="20" font-family="IBM Plex Mono" font-size="9" fill="#ef5350" text-anchor="middle">OPEN</text>
+          <text x="60" y="185" font-family="IBM Plex Mono" font-size="9" fill="#ef5350" text-anchor="middle">CLOSE</text>
+        </svg>
+      </div>
+      <div class="explorer-detail">
+        <div class="explorer-name">Bearish Marubozu</div>
+        <div class="explorer-japanese">陰の丸坊主 · "Bearish Shaved Head"</div>
+        <div class="explorer-desc">A long red body with no shadows. Sellers controlled the entire session. The open is the high; the close is the low. One of the most bearish single-candle signals — implies continuation of downward momentum or a decisive bearish reversal.</div>
+        <div class="explorer-rules-title">Formation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>No upper shadow (open = high)</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>No lower shadow (close = low)</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Strong bearish conviction throughout session</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Most significant at key support breakdowns</div>
+        </div>
+        <div class="explorer-stats">
+          <div class="stat-box"><div class="key">Signal Type</div><div class="val" style="color:var(--bear);font-size:12px;">Bearish Continuation/Reversal</div></div>
+          <div class="stat-box"><div class="key">Reliability</div><div class="val" style="color:var(--bear);font-size:12px;">~63% (trending)</div></div>
+          <div class="stat-box"><div class="key">Candles</div><div class="val" style="font-size:12px;">Single</div></div>
+          <div class="stat-box"><div class="key">Confirmation</div><div class="val" style="font-size:12px;">Follow-through close</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="open-mar" class="explorer-panel">
+      <div class="explorer-visual">
+        <svg width="120" height="200" viewBox="0 0 120 200">
+          <line x1="60" y1="30" x2="60" y2="60" stroke="#26a69a" stroke-width="2"/>
+          <rect x="45" y="60" width="30" height="110" rx="3" fill="#26a69a" opacity="0.9"/>
+          <text x="60" y="185" font-family="IBM Plex Mono" font-size="9" fill="#26a69a" text-anchor="middle">OPEN</text>
+        </svg>
+      </div>
+      <div class="explorer-detail">
+        <div class="explorer-name">Opening Marubozu</div>
+        <div class="explorer-japanese">陽の寄引坊主 · "Opening Shaved"</div>
+        <div class="explorer-desc">Has no lower shadow (open = low) but has an upper shadow. Buyers were strong at the open but faced some selling pressure near the high. Less powerful than a full Marubozu but still a bullish signal — buyers controlled the bottom of the range.</div>
+        <div class="explorer-rules-title">Formation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>No lower shadow (open = low)</div>
+          <div class="rule-item"><div class="rule-dot neutral-dot"></div>Upper shadow present (sellers near high)</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Strong bullish body</div>
+        </div>
+      </div>
+    </div>
+    <div id="close-mar" class="explorer-panel">
+      <div class="explorer-visual">
+        <svg width="120" height="200" viewBox="0 0 120 200">
+          <rect x="45" y="30" width="30" height="130" rx="3" fill="#26a69a" opacity="0.9"/>
+          <line x1="60" y1="160" x2="60" y2="175" stroke="#26a69a" stroke-width="2"/>
+          <text x="60" y="20" font-family="IBM Plex Mono" font-size="9" fill="#26a69a" text-anchor="middle">CLOSE</text>
+        </svg>
+      </div>
+      <div class="explorer-detail">
+        <div class="explorer-name">Closing Marubozu</div>
+        <div class="explorer-japanese">陽の引坊主 · "Closing Shaved"</div>
+        <div class="explorer-desc">Has no upper shadow (close = high) but has a lower shadow. Buyers finished strong, closing at the session high despite an early test of lower prices. A bullish signal — the close is strong and the low was decisively rejected.</div>
+        <div class="explorer-rules-title">Formation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>No upper shadow (close = high)</div>
+          <div class="rule-item"><div class="rule-dot neutral-dot"></div>Lower shadow present (buyers absorbed dip)</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Strong close is the key signal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 6: DOJI FAMILY
+═══════════════════════════════════════════════════════════ -->
+<section id="doji">
+  <div class="section-num">06 / SINGLE CANDLE</div>
+  <h2>The Doji Family</h2>
+  <p class="section-intro">A doji forms when open ≈ close. It is the purest expression of market indecision — but context determines whether it is a reversal or continuation signal.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">CMT Insight</div>
+    <p>A doji has far more significance after a prolonged trend than during a sideways market. In consolidation, dojis are expected. After a sustained uptrend, a doji warns that bullish momentum has stalled and sellers are beginning to find their footing.</p>
+  </div>
+
+  <div class="pattern-grid" id="doji-grid">
+    <div class="pattern-card neutral" data-filter="single neutral">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">Standard Doji</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="20" y1="5" x2="20" y2="32" stroke="#8b9db0" stroke-width="1.5"/>
+            <line x1="8" y1="35" x2="32" y2="35" stroke="#8b9db0" stroke-width="2"/>
+            <line x1="20" y1="38" x2="20" y2="65" stroke="#8b9db0" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Neutral</div>
+      </div>
+      <div class="pattern-card-desc">Open = close; roughly equal upper and lower shadows forming a cross. Pure market indecision. The classic signal of a trend losing momentum.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:50%"></div></div>
+        <div class="rel-pct">50%</div>
+      </div>
+    </div>
+
+    <div class="pattern-card neutral" data-filter="single neutral">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">Long-Legged Doji</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="20" y1="3" x2="20" y2="33" stroke="#8b9db0" stroke-width="1.5"/>
+            <line x1="8" y1="35" x2="32" y2="35" stroke="#8b9db0" stroke-width="2"/>
+            <line x1="20" y1="37" x2="20" y2="67" stroke="#8b9db0" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Neutral</div>
+      </div>
+      <div class="pattern-card-desc">Very long upper and lower shadows. Extreme volatility during the session but neither side could hold gains. Signals heightened uncertainty and potential reversal.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:50%"></div></div>
+        <div class="rel-pct">~50%</div>
+      </div>
+    </div>
+
+    <div class="pattern-card bull" data-filter="single bull">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">Dragonfly Doji</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="20" y1="8" x2="20" y2="12" stroke="#26a69a" stroke-width="1.5"/>
+            <line x1="8" y1="12" x2="32" y2="12" stroke="#26a69a" stroke-width="2"/>
+            <line x1="20" y1="12" x2="20" y2="62" stroke="#26a69a" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Bullish</div>
+      </div>
+      <div class="pattern-card-desc">Open, high, and close are all at the top of the candle. Long lower shadow shows sellers pushed price down aggressively but buyers absorbed everything and closed near the high. Strong bullish reversal at support.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:55%"></div></div>
+        <div class="rel-pct">55%</div>
+      </div>
+    </div>
+
+    <div class="pattern-card bear" data-filter="single bear">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">Gravestone Doji</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="20" y1="8" x2="20" y2="58" stroke="#ef5350" stroke-width="1.5"/>
+            <line x1="8" y1="58" x2="32" y2="58" stroke="#ef5350" stroke-width="2"/>
+            <line x1="20" y1="60" x2="20" y2="64" stroke="#ef5350" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Bearish</div>
+      </div>
+      <div class="pattern-card-desc">Open, low, and close are all at the bottom. Long upper shadow shows buyers tried to extend gains but were completely rejected by sellers at the high. Strong bearish reversal signal at resistance.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:55%"></div></div>
+        <div class="rel-pct">55%</div>
+      </div>
+    </div>
+
+    <div class="pattern-card neutral" data-filter="single neutral">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">4-Price Doji</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="8" y1="35" x2="32" y2="35" stroke="#8b9db0" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Rare</div>
+      </div>
+      <div class="pattern-card-desc">All four price points are identical. Open = high = low = close. Extremely rare. Common in illiquid markets or thinly traded securities. Signals near-complete market paralysis.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:40%"></div></div>
+        <div class="rel-pct">Low</div>
+      </div>
+    </div>
+
+    <div class="pattern-card neutral" data-filter="single neutral">
+      <div class="pattern-card-top">
+        <div>
+          <div class="pattern-card-title">Rickshaw Man</div>
+          <svg width="40" height="70" viewBox="0 0 40 70" style="margin-top:8px;">
+            <line x1="20" y1="5" x2="20" y2="33" stroke="#8b9db0" stroke-width="1.5"/>
+            <line x1="8" y1="35" x2="32" y2="35" stroke="#8b9db0" stroke-width="2.5"/>
+            <line x1="20" y1="37" x2="20" y2="65" stroke="#8b9db0" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="pattern-card-tag">Neutral</div>
+      </div>
+      <div class="pattern-card-desc">A long-legged doji where the crossbar (open/close) is near the center of the candle. Considered a strong indecision signal. Used in the Japanese "Three Doji" patterns to identify major market turning points.</div>
+      <div class="rel-bar-wrap">
+        <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:48%"></div></div>
+        <div class="rel-pct">48%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 7: SPINNING TOP
+═══════════════════════════════════════════════════════════ -->
+<section id="spinning">
+  <div class="section-num">07 / SINGLE CANDLE</div>
+  <h2>Spinning Top</h2>
+  <p class="section-intro">Similar to a doji but with a visible body. A small real body with long equal shadows on both sides signals indecision and a potential trend pause or reversal.</p>
+
+  <div class="anatomy-wrap">
+    <div style="display:flex;gap:24px;">
+      <div class="candle-svg-wrap">
+        <svg width="40" height="120" viewBox="0 0 40 120">
+          <line x1="20" y1="8" x2="20" y2="42" stroke="#26a69a" stroke-width="1.5"/>
+          <rect x="10" y="42" width="20" height="20" rx="2" fill="#26a69a" opacity="0.85"/>
+          <line x1="20" y1="62" x2="20" y2="112" stroke="#26a69a" stroke-width="1.5"/>
+        </svg>
+        <div class="candle-label">Bullish<br>Spinning Top</div>
+      </div>
+      <div class="candle-svg-wrap">
+        <svg width="40" height="120" viewBox="0 0 40 120">
+          <line x1="20" y1="8" x2="20" y2="42" stroke="#ef5350" stroke-width="1.5"/>
+          <rect x="10" y="42" width="20" height="20" rx="2" fill="#ef5350" opacity="0.85"/>
+          <line x1="20" y1="62" x2="20" y2="112" stroke="#ef5350" stroke-width="1.5"/>
+        </svg>
+        <div class="candle-label">Bearish<br>Spinning Top</div>
+      </div>
+    </div>
+    <div>
+      <h4>Key Characteristics</h4>
+      <ul style="font-size:14px;">
+        <li>Small real body (bull or bear) centered between long shadows</li>
+        <li>Both shadows roughly equal length — balanced battle</li>
+        <li>Significant only when appearing after a trend, not in consolidation</li>
+        <li>Bullish spinning top after a downtrend = bulls beginning to fight back</li>
+        <li>Bearish spinning top after an uptrend = bears beginning to resist</li>
+        <li>Always requires confirmation from the next candle</li>
+      </ul>
+      <div class="callout bear" style="margin-top:16px;">
+        <div class="callout-label">Common Error</div>
+        <p>Spinning tops alone do not constitute a trade signal. They are alerts to watch for a follow-through candle. Acting on a spinning top without confirmation has very low reliability (~50%).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 8: HAMMER / HANGING MAN
+═══════════════════════════════════════════════════════════ -->
+<section id="hammer">
+  <div class="section-num">08 / SINGLE CANDLE</div>
+  <h2>Hammer &amp; Hanging Man</h2>
+  <p class="section-intro">The same shape, two opposite signals. Context — the prior trend — determines everything. This is the classic example of how candlestick patterns cannot be evaluated in isolation.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <svg width="40" height="100" viewBox="0 0 40 100">
+          <line x1="20" y1="8" x2="20" y2="20" stroke="#26a69a" stroke-width="1.5"/>
+          <rect x="10" y="20" width="20" height="18" rx="2" fill="#26a69a" opacity="0.85"/>
+          <line x1="20" y1="38" x2="20" y2="90" stroke="#26a69a" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Hammer</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:10px;">BULLISH REVERSAL</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Appears at the <strong style="color:var(--text)">bottom of a downtrend</strong>. Long lower shadow (≥2× the body) shows sellers pushed price aggressively lower, but buyers stepped in and drove it back up near the open. The bulls are beginning to win the battle.</div>
+        </div>
+      </div>
+      <div class="explorer-rules" style="margin-top:16px;">
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Must appear after a downtrend</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Small body at the top of the range</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Lower shadow ≥ 2× the body length</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Little or no upper shadow</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Green body more bullish than red</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <svg width="40" height="100" viewBox="0 0 40 100">
+          <line x1="20" y1="8" x2="20" y2="20" stroke="#ef5350" stroke-width="1.5"/>
+          <rect x="10" y="20" width="20" height="18" rx="2" fill="#ef5350" opacity="0.85"/>
+          <line x1="20" y1="38" x2="20" y2="90" stroke="#ef5350" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Hanging Man</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:10px;">BEARISH REVERSAL</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Identical shape, but appears at the <strong style="color:var(--text)">top of an uptrend</strong>. The long lower shadow shows that sellers successfully pushed prices down significantly during the session — a warning that bears are awakening. The eventual recovery doesn't guarantee continuation.</div>
+        </div>
+      </div>
+      <div class="explorer-rules" style="margin-top:16px;">
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Must appear after an uptrend</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Same shape as hammer</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Lower shadow ≥ 2× the body</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Red body more bearish than green</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Requires next-candle confirmation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-label">CMT Key Insight — Context Is Everything</div>
+    <p>A hammer and hanging man share the identical visual structure. The only difference is where they appear in a trend. This illustrates the most fundamental principle in candlestick analysis: <em>patterns cannot be interpreted without knowledge of the prior price action.</em></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 9: SHOOTING STAR / INVERTED HAMMER
+═══════════════════════════════════════════════════════════ -->
+<section id="shooting">
+  <div class="section-num">09 / SINGLE CANDLE</div>
+  <h2>Shooting Star &amp; Inverted Hammer</h2>
+  <p class="section-intro">The mirror image of the hammer family. Small body at the bottom of the candle's range with a long upper shadow. Again — the same shape, opposite implications based on trend context.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <svg width="40" height="100" viewBox="0 0 40 100">
+          <line x1="20" y1="8" x2="20" y2="62" stroke="#ef5350" stroke-width="1.5"/>
+          <rect x="10" y="62" width="20" height="18" rx="2" fill="#ef5350" opacity="0.85"/>
+          <line x1="20" y1="80" x2="20" y2="86" stroke="#ef5350" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Shooting Star</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:10px;">BEARISH REVERSAL</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Appears at the <strong style="color:var(--text)">top of an uptrend</strong>. Buyers pushed price sharply higher during the session but sellers crushed them back down to close near the open. The long upper shadow is a bearish rejection of higher prices.</div>
+        </div>
+      </div>
+      <div class="explorer-rules" style="margin-top:16px;">
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Must appear after an uptrend</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Small body at the bottom of the range</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Upper shadow ≥ 2× the body</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Little or no lower shadow</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Gap up on open strengthens signal</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <svg width="40" height="100" viewBox="0 0 40 100">
+          <line x1="20" y1="8" x2="20" y2="62" stroke="#26a69a" stroke-width="1.5"/>
+          <rect x="10" y="62" width="20" height="18" rx="2" fill="#26a69a" opacity="0.85"/>
+          <line x1="20" y1="80" x2="20" y2="86" stroke="#26a69a" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Inverted Hammer</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:10px;">BULLISH REVERSAL</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Appears at the <strong style="color:var(--text)">bottom of a downtrend</strong>. Same shape as the shooting star. Buyers attempted a rally — while they couldn't sustain it, the attempt itself signals that buying interest is emerging. Requires a confirming bullish candle.</div>
+        </div>
+      </div>
+      <div class="explorer-rules" style="margin-top:16px;">
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Must appear after a downtrend</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Same shape as shooting star</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Upper shadow ≥ 2× the body</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Confirming bullish candle required</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 10: ENGULFING PATTERNS
+═══════════════════════════════════════════════════════════ -->
+<section id="engulfing">
+  <div class="section-num">10 / TWO-CANDLE</div>
+  <h2>Engulfing Patterns</h2>
+  <p class="section-intro">Among the most reliable two-candle reversal patterns. The second candle completely consumes the body of the first, signaling a decisive shift in market control.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bullish Engulfing</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH REVERSAL · ~63% Reliability</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <!-- Prior red candle -->
+        <line x1="25" y1="18" x2="25" y2="28" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="15" y="28" width="20" height="28" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="25" y1="56" x2="25" y2="66" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Engulfing green candle -->
+        <line x1="57" y1="16" x2="57" y2="22" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="45" y="22" width="24" height="52" rx="2" fill="#26a69a" opacity="0.9"/>
+        <line x1="57" y1="74" x2="57" y2="82" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A green candle completely engulfs the body of the prior red candle. Bulls have overwhelmed bears. The larger the engulfing candle relative to the first, the more powerful the signal.</div>
+      <div class="explorer-rules" style="margin-top:12px;">
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Day 1: bearish candle (any size)</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Day 2: opens lower than Day 1 close</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Day 2: closes above Day 1 open</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Volume on Day 2 ideally higher</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bearish Engulfing</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">BEARISH REVERSAL · ~63% Reliability</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <!-- Prior green candle -->
+        <line x1="23" y1="18" x2="23" y2="28" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="13" y="28" width="20" height="28" rx="2" fill="#26a69a" opacity="0.8"/>
+        <line x1="23" y1="56" x2="23" y2="66" stroke="#26a69a" stroke-width="1.5"/>
+        <!-- Engulfing red candle -->
+        <line x1="57" y1="16" x2="57" y2="22" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="45" y="22" width="24" height="52" rx="2" fill="#ef5350" opacity="0.9"/>
+        <line x1="57" y1="74" x2="57" y2="82" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A red candle completely engulfs the body of the prior green candle. Sellers have overwhelmed buyers decisively. More powerful when it appears at key resistance after a significant advance.</div>
+      <div class="explorer-rules" style="margin-top:12px;">
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Day 1: bullish candle</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Day 2: opens above Day 1 close</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Day 2: closes below Day 1 open</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Gap up open on Day 2 strengthens</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-label">Signal Strength Factors</div>
+    <p>Engulfing patterns are stronger when: (1) the engulfing body is significantly larger than the prior candle, (2) they appear after a prolonged trend, (3) the pattern forms at a significant support or resistance level, (4) volume is higher on the engulfing day, and (5) the open of the engulfing candle gaps away from the prior close.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 11: HARAMI
+═══════════════════════════════════════════════════════════ -->
+<section id="harami">
+  <div class="section-num">11 / TWO-CANDLE</div>
+  <h2>Harami</h2>
+  <p class="section-intro">Japanese for "pregnant." The opposite of the engulfing — the second candle is entirely contained within the first. A weaker reversal signal that requires confirmation.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bullish Harami</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH REVERSAL · Requires Confirmation</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <line x1="25" y1="10" x2="25" y2="18" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="14" y="18" width="22" height="56" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="25" y1="74" x2="25" y2="84" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Small bullish inside -->
+        <rect x="48" y="38" width="22" height="22" rx="2" fill="#26a69a" opacity="0.9"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A large bearish candle is followed by a smaller bullish candle whose body is entirely within the first. Selling momentum has stalled. The bulls have appeared, but haven't yet proven dominance.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Harami Cross</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--neutral);margin-bottom:14px;">STRONGER SIGNAL · Doji Version</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <line x1="25" y1="10" x2="25" y2="18" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="14" y="18" width="22" height="56" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="25" y1="74" x2="25" y2="84" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Doji inside -->
+        <line x1="57" y1="36" x2="57" y2="49" stroke="#8b9db0" stroke-width="1.5"/>
+        <line x1="48" y1="49" x2="66" y2="49" stroke="#8b9db0" stroke-width="2"/>
+        <line x1="57" y1="51" x2="57" y2="62" stroke="#8b9db0" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A large candle followed by a doji contained within its range. Considered stronger than the standard harami because the doji confirms complete indecision — the trend may be about to reverse.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 12: PIERCING / DARK CLOUD
+═══════════════════════════════════════════════════════════ -->
+<section id="piercing">
+  <div class="section-num">12 / TWO-CANDLE</div>
+  <h2>Piercing Line &amp; Dark Cloud Cover</h2>
+  <p class="section-intro">Two-candle patterns where the second candle penetrates at least halfway into the body of the first. The halfway threshold is the critical validation rule.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Piercing Line</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH REVERSAL · After Downtrend</div>
+      <svg width="80" height="110" viewBox="0 0 80 110" style="margin-bottom:14px;">
+        <!-- Red candle -->
+        <line x1="25" y1="10" x2="25" y2="20" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="14" y="20" width="22" height="60" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="25" y1="80" x2="25" y2="90" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Green candle opening below, closing above midpoint of red -->
+        <line x1="57" y1="55" x2="57" y2="62" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="45" y="30" width="22" height="32" rx="2" fill="#26a69a" opacity="0.9"/>
+        <line x1="57" y1="94" x2="57" y2="100" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Day 1: long bearish candle. Day 2: opens below Day 1's low (gap down), then rallies to close <strong style="color:var(--text)">above the midpoint</strong> of Day 1's body. The deeper the penetration, the stronger the signal.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Dark Cloud Cover</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">BEARISH REVERSAL · After Uptrend</div>
+      <svg width="80" height="110" viewBox="0 0 80 110" style="margin-bottom:14px;">
+        <!-- Green candle -->
+        <line x1="25" y1="10" x2="25" y2="20" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="14" y="20" width="22" height="60" rx="2" fill="#26a69a" opacity="0.8"/>
+        <line x1="25" y1="80" x2="25" y2="90" stroke="#26a69a" stroke-width="1.5"/>
+        <!-- Red candle opening above, closing below midpoint -->
+        <line x1="57" y1="10" x2="57" y2="18" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="45" y="38" width="22" height="52" rx="2" fill="#ef5350" opacity="0.9"/>
+        <line x1="57" y1="90" x2="57" y2="100" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Day 1: long bullish candle. Day 2: opens above Day 1's high (gap up), then sells off to close <strong style="color:var(--text)">below the midpoint</strong> of Day 1's body. The false gap-up traps late bulls.</div>
+    </div>
+  </div>
+
+  <div class="callout bear">
+    <div class="callout-label">Validation Rule</div>
+    <p>If the second candle closes <em>less than</em> 50% into the prior candle's body, neither pattern is valid. Some practitioners require a 2/3 penetration for a high-confidence signal. Always measure body-to-body, not including shadows.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 13: TWEEZERS
+═══════════════════════════════════════════════════════════ -->
+<section id="tweezers">
+  <div class="section-num">13 / TWO-CANDLE</div>
+  <h2>Tweezer Tops &amp; Bottoms</h2>
+  <p class="section-intro">Two candles that test the same extreme price level. The market attempted to move past a price twice and was rejected both times — a dual confirmation of support or resistance.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Tweezer Bottom</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH REVERSAL</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <line x1="25" y1="10" x2="25" y2="22" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="14" y="22" width="22" height="30" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="25" y1="52" x2="25" y2="75" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Equal low line -->
+        <line x1="8" y1="75" x2="72" y2="75" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <line x1="55" y1="10" x2="55" y2="30" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="44" y="30" width="22" height="28" rx="2" fill="#26a69a" opacity="0.85"/>
+        <line x1="55" y1="58" x2="55" y2="75" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Two candles share the same low. The first is bearish; the second is bullish. The support level held twice, confirming that buyers are defending this price. Best when accompanied by volume.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Tweezer Top</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">BEARISH REVERSAL</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <line x1="25" y1="22" x2="25" y2="26" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="14" y="26" width="22" height="30" rx="2" fill="#26a69a" opacity="0.8"/>
+        <line x1="25" y1="56" x2="25" y2="85" stroke="#26a69a" stroke-width="1.5"/>
+        <!-- Equal high line -->
+        <line x1="8" y1="22" x2="72" y2="22" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <line x1="55" y1="22" x2="55" y2="26" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="44" y="26" width="22" height="30" rx="2" fill="#ef5350" opacity="0.85"/>
+        <line x1="55" y1="56" x2="55" y2="85" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Two candles share the same high. The first is bullish; the second is bearish. Resistance held twice. Bulls tried to extend the rally on both sessions and failed. The level is a proven ceiling.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 14: KICKER
+═══════════════════════════════════════════════════════════ -->
+<section id="kicker">
+  <div class="section-num">14 / TWO-CANDLE</div>
+  <h2>Kicker Patterns</h2>
+  <p class="section-intro">Considered one of the most powerful two-candle patterns. A complete overnight reversal driven by sudden, dramatic news or sentiment shift. The gap between candles leaves no room for debate.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bullish Kicker</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">VERY STRONG REVERSAL · Rarely Fails</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <!-- Bearish candle -->
+        <rect x="14" y="20" width="22" height="50" rx="2" fill="#ef5350" opacity="0.8"/>
+        <!-- Gap space -->
+        <!-- Bullish candle, opens with big gap up -->
+        <rect x="44" y="5" width="22" height="50" rx="2" fill="#26a69a" opacity="0.9"/>
+        <!-- Gap annotation -->
+        <line x1="8" y1="70" x2="72" y2="70" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="8" y1="5" x2="72" y2="5" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="76" y="38" font-family="IBM Plex Mono" font-size="7" fill="#c9a84c">GAP</text>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Bearish candle followed by a bullish candle that <strong style="color:var(--text)">gaps up</strong> at the open and moves strongly higher. The gap forms because sentiment shifted dramatically overnight — earnings surprise, news event, or policy change. Almost no overlap between candles.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bearish Kicker</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">VERY STRONG REVERSAL · Rarely Fails</div>
+      <svg width="80" height="100" viewBox="0 0 80 100" style="margin-bottom:14px;">
+        <rect x="14" y="20" width="22" height="50" rx="2" fill="#26a69a" opacity="0.8"/>
+        <rect x="44" y="45" width="22" height="50" rx="2" fill="#ef5350" opacity="0.9"/>
+        <line x1="8" y1="20" x2="72" y2="20" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="8" y1="45" x2="72" y2="45" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="76" y="32" font-family="IBM Plex Mono" font-size="7" fill="#c9a84c">GAP</text>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Bullish candle followed by a bearish candle that <strong style="color:var(--text)">gaps down</strong> at the open and sells off strongly. All prior gains are suddenly erased as sentiment collapses. This pattern reflects complete capitulation of the bullish thesis.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 15: MORNING / EVENING STAR
+═══════════════════════════════════════════════════════════ -->
+<section id="morning-star">
+  <div class="section-num">15 / THREE-CANDLE</div>
+  <h2>Morning Star &amp; Evening Star</h2>
+  <p class="section-intro">Three-candle formations considered among the most reliable reversal patterns in the candlestick toolkit. They represent a complete three-act story of trend exhaustion, indecision, and reversal.</p>
+
+  <!-- Morning Star Explorer -->
+  <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:12px; padding:28px; max-width:700px; margin:28px 0;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;">
+      <div>
+        <div style="font-family:var(--serif);font-size:22px;color:var(--text);margin-bottom:4px;">Morning Star</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH REVERSAL · ~78% Reliability (confirmed)</div>
+        <svg width="120" height="120" viewBox="0 0 120 120" style="margin-bottom:14px;">
+          <!-- Candle 1: Large bearish -->
+          <line x1="20" y1="8" x2="20" y2="16" stroke="#ef5350" stroke-width="1.5"/>
+          <rect x="10" y="16" width="20" height="55" rx="2" fill="#ef5350" opacity="0.85"/>
+          <line x1="20" y1="71" x2="20" y2="80" stroke="#ef5350" stroke-width="1.5"/>
+          <!-- Candle 2: Small star (gap down) -->
+          <rect x="50" y="82" width="14" height="10" rx="2" fill="#888780" opacity="0.85"/>
+          <line x1="57" y1="76" x2="57" y2="82" stroke="#888780" stroke-width="1.5"/>
+          <line x1="57" y1="92" x2="57" y2="98" stroke="#888780" stroke-width="1.5"/>
+          <!-- Candle 3: Large bullish -->
+          <line x1="95" y1="8" x2="95" y2="18" stroke="#26a69a" stroke-width="1.5"/>
+          <rect x="85" y="18" width="20" height="55" rx="2" fill="#26a69a" opacity="0.9"/>
+          <line x1="95" y1="73" x2="95" y2="80" stroke="#26a69a" stroke-width="1.5"/>
+          <!-- Gap indicators -->
+          <line x1="32" y1="71" x2="50" y2="82" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+          <line x1="65" y1="82" x2="85" y2="73" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="explorer-rules-title">Three-Act Structure</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bear-dot"></div><strong style="color:var(--text)">Act 1 — Seller dominance:</strong> Large bearish candle confirms downtrend is in force</div>
+          <div class="rule-item"><div class="rule-dot neutral-dot"></div><strong style="color:var(--text)">Act 2 — Indecision:</strong> Small body star gaps lower; neither bulls nor bears win</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div><strong style="color:var(--text)">Act 3 — Bull reversal:</strong> Large bullish candle closes deep into Act 1's body</div>
+        </div>
+        <div class="explorer-rules-title" style="margin-top:16px;">Validation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Star body ideally gaps below Day 1's body</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Day 3 closes above midpoint of Day 1</div>
+          <div class="rule-item"><div class="rule-dot bull-dot"></div>Volume: highest on Day 3</div>
+          <div class="rule-item"><div class="rule-dot neutral-dot"></div>Morning Doji Star = even stronger</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evening Star -->
+  <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:12px; padding:28px; max-width:700px; margin:16px 0;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;">
+      <div>
+        <div style="font-family:var(--serif);font-size:22px;color:var(--text);margin-bottom:4px;">Evening Star</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">BEARISH REVERSAL · ~72% Reliability (confirmed)</div>
+        <svg width="120" height="120" viewBox="0 0 120 120" style="margin-bottom:14px;">
+          <!-- Candle 1: Large bullish -->
+          <line x1="20" y1="8" x2="20" y2="18" stroke="#26a69a" stroke-width="1.5"/>
+          <rect x="10" y="18" width="20" height="55" rx="2" fill="#26a69a" opacity="0.85"/>
+          <line x1="20" y1="73" x2="20" y2="80" stroke="#26a69a" stroke-width="1.5"/>
+          <!-- Candle 2: Small star (gap up) -->
+          <rect x="50" y="6" width="14" height="10" rx="2" fill="#888780" opacity="0.85"/>
+          <line x1="57" y1="3" x2="57" y2="6" stroke="#888780" stroke-width="1.5"/>
+          <line x1="57" y1="16" x2="57" y2="20" stroke="#888780" stroke-width="1.5"/>
+          <!-- Candle 3: Large bearish -->
+          <line x1="95" y1="8" x2="95" y2="18" stroke="#ef5350" stroke-width="1.5"/>
+          <rect x="85" y="18" width="20" height="55" rx="2" fill="#ef5350" opacity="0.9"/>
+          <line x1="95" y1="73" x2="95" y2="82" stroke="#ef5350" stroke-width="1.5"/>
+          <line x1="32" y1="18" x2="50" y2="6" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+          <line x1="65" y1="16" x2="85" y2="18" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="explorer-rules-title">Three-Act Structure</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bull-dot"></div><strong style="color:var(--text)">Act 1 — Bull dominance:</strong> Large bullish candle confirms uptrend is in force</div>
+          <div class="rule-item"><div class="rule-dot neutral-dot"></div><strong style="color:var(--text)">Act 2 — Exhaustion:</strong> Small star gaps higher; buyers can't continue momentum</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div><strong style="color:var(--text)">Act 3 — Bear reversal:</strong> Large bearish candle closes deep into Act 1's body</div>
+        </div>
+        <div class="explorer-rules-title" style="margin-top:16px;">Validation Rules</div>
+        <div class="explorer-rules">
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Star body ideally gaps above Day 1's body</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Day 3 closes below midpoint of Day 1</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Evening Doji Star = even stronger</div>
+          <div class="rule-item"><div class="rule-dot bear-dot"></div>Appears at or near key resistance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 16: THREE SOLDIERS / CROWS
+═══════════════════════════════════════════════════════════ -->
+<section id="three-soldiers">
+  <div class="section-num">16 / THREE-CANDLE</div>
+  <h2>Three White Soldiers &amp; Three Black Crows</h2>
+  <p class="section-intro">Three consecutive strong directional candles. These are continuation or reversal signals of exceptional strength — they represent sustained, organized buying or selling pressure across three full sessions.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Three White Soldiers</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">STRONG BULLISH REVERSAL</div>
+      <svg width="100" height="110" viewBox="0 0 100 110" style="margin-bottom:14px;">
+        <rect x="8" y="62" width="22" height="40" rx="2" fill="#26a69a" opacity="0.75"/>
+        <line x1="19" y1="58" x2="19" y2="62" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="19" y1="102" x2="19" y2="106" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="38" y="40" width="22" height="45" rx="2" fill="#26a69a" opacity="0.85"/>
+        <line x1="49" y1="36" x2="49" y2="40" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="49" y1="85" x2="49" y2="90" stroke="#26a69a" stroke-width="1.5"/>
+        <rect x="68" y="18" width="22" height="50" rx="2" fill="#26a69a" opacity="0.95"/>
+        <line x1="79" y1="14" x2="79" y2="18" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="79" y1="68" x2="79" y2="74" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;">Three consecutive long bullish candles, each closing higher than the previous. Each opens within or near the body of the prior candle. Represents sustained institutional buying.</div>
+      <div class="explorer-rules">
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Each candle has a long body</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div>Each opens within prior body</div>
+        <div class="rule-item"><div class="rule-dot bull-dot"></div">Each closes progressively higher</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>Small upper shadows are acceptable</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Caution: increasingly smaller bodies = weakening momentum</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Three Black Crows</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">STRONG BEARISH REVERSAL</div>
+      <svg width="100" height="110" viewBox="0 0 100 110" style="margin-bottom:14px;">
+        <rect x="8" y="8" width="22" height="40" rx="2" fill="#ef5350" opacity="0.75"/>
+        <line x1="19" y1="4" x2="19" y2="8" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="19" y1="48" x2="19" y2="54" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="38" y="24" width="22" height="44" rx="2" fill="#ef5350" opacity="0.85"/>
+        <line x1="49" y1="20" x2="49" y2="24" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="49" y1="68" x2="49" y2="74" stroke="#ef5350" stroke-width="1.5"/>
+        <rect x="68" y="40" width="22" height="48" rx="2" fill="#ef5350" opacity="0.95"/>
+        <line x1="79" y1="36" x2="79" y2="40" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="79" y1="88" x2="79" y2="94" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;">Three consecutive long bearish candles, each closing lower. Each opens within the prior candle's body. Relentless selling pressure across three sessions signals a decisive bearish reversal or continuation.</div>
+      <div class="explorer-rules">
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Three long bearish candles</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Each opens within prior body</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div>Each closes progressively lower</div>
+        <div class="rule-item"><div class="rule-dot bear-dot"></div">Short upper shadows preferred</div>
+        <div class="rule-item"><div class="rule-dot neutral-dot"></div>After extended downtrend = over-extension risk</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 17: THREE INSIDE
+═══════════════════════════════════════════════════════════ -->
+<section id="three-inside">
+  <div class="section-num">17 / THREE-CANDLE</div>
+  <h2>Three Inside Up &amp; Three Inside Down</h2>
+  <p class="section-intro">A confirmed harami. The third candle provides the evidence needed to validate what the harami merely suggested — the reversal is underway.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Three Inside Up</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">CONFIRMED BULLISH REVERSAL · ~65%</div>
+      <svg width="100" height="110" viewBox="0 0 100 110" style="margin-bottom:14px;">
+        <!-- Large bear -->
+        <rect x="8" y="15" width="22" height="60" rx="2" fill="#ef5350" opacity="0.8"/>
+        <!-- Small bull inside -->
+        <rect x="38" y="38" width="22" height="22" rx="2" fill="#26a69a" opacity="0.85"/>
+        <!-- Confirming bull -->
+        <rect x="68" y="10" width="22" height="52" rx="2" fill="#26a69a" opacity="0.95"/>
+        <line x1="79" y1="6" x2="79" y2="10" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="79" y1="62" x2="79" y2="68" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);">Bearish candle → small bullish inside → confirming bullish close above Day 1's open. The third candle is the key — it proves the reversal has follow-through.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Three Inside Down</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">CONFIRMED BEARISH REVERSAL · ~65%</div>
+      <svg width="100" height="110" viewBox="0 0 100 110" style="margin-bottom:14px;">
+        <rect x="8" y="15" width="22" height="60" rx="2" fill="#26a69a" opacity="0.8"/>
+        <rect x="38" y="38" width="22" height="22" rx="2" fill="#ef5350" opacity="0.85"/>
+        <rect x="68" y="28" width="22" height="55" rx="2" fill="#ef5350" opacity="0.95"/>
+        <line x1="79" y1="23" x2="79" y2="28" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="79" y1="83" x2="79" y2="90" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);">Bullish candle → small bearish inside → confirming bearish close below Day 1's open. The third candle confirms the harami was genuine exhaustion, not just a pause.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 18: ABANDONED BABY
+═══════════════════════════════════════════════════════════ -->
+<section id="abandoned">
+  <div class="section-num">18 / THREE-CANDLE</div>
+  <h2>Abandoned Baby</h2>
+  <p class="section-intro">The rarest and most powerful three-candle reversal pattern. A doji that is completely isolated from surrounding candles by gaps — a market that was utterly abandoned, with no overlap of any kind.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bullish Abandoned Baby</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">RARE · EXTREMELY POWERFUL</div>
+      <svg width="100" height="120" viewBox="0 0 100 120" style="margin-bottom:14px;">
+        <!-- Large bearish -->
+        <rect x="8" y="15" width="22" height="55" rx="2" fill="#ef5350" opacity="0.8"/>
+        <line x1="19" y1="10" x2="19" y2="15" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="19" y1="70" x2="19" y2="78" stroke="#ef5350" stroke-width="1.5"/>
+        <!-- Doji with gap down -->
+        <line x1="50" y1="86" x2="50" y2="94" stroke="#888780" stroke-width="1.5"/>
+        <line x1="42" y1="90" x2="58" y2="90" stroke="#888780" stroke-width="2"/>
+        <line x1="50" y1="92" x2="50" y2="100" stroke="#888780" stroke-width="1.5"/>
+        <!-- Large bullish with gap up -->
+        <rect x="74" y="18" width="22" height="54" rx="2" fill="#26a69a" opacity="0.9"/>
+        <line x1="85" y1="14" x2="85" y2="18" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="85" y1="72" x2="85" y2="78" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Bear candle → gap down doji → gap up bullish candle. The doji is completely isolated. Both gaps (down and up) confirm complete selling exhaustion and a fresh surge of buying interest. The market <em>abandoned</em> the bears.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Bearish Abandoned Baby</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">RARE · EXTREMELY POWERFUL</div>
+      <svg width="100" height="120" viewBox="0 0 100 120" style="margin-bottom:14px;">
+        <!-- Large bullish -->
+        <rect x="8" y="35" width="22" height="55" rx="2" fill="#26a69a" opacity="0.8"/>
+        <line x1="19" y1="30" x2="19" y2="35" stroke="#26a69a" stroke-width="1.5"/>
+        <line x1="19" y1="90" x2="19" y2="96" stroke="#26a69a" stroke-width="1.5"/>
+        <!-- Doji with gap up -->
+        <line x1="50" y1="14" x2="50" y2="22" stroke="#888780" stroke-width="1.5"/>
+        <line x1="42" y1="22" x2="58" y2="22" stroke="#888780" stroke-width="2"/>
+        <line x1="50" y1="24" x2="50" y2="30" stroke="#888780" stroke-width="1.5"/>
+        <!-- Large bearish with gap down -->
+        <rect x="74" y="38" width="22" height="55" rx="2" fill="#ef5350" opacity="0.9"/>
+        <line x1="85" y1="32" x2="85" y2="38" stroke="#ef5350" stroke-width="1.5"/>
+        <line x1="85" y1="93" x2="85" y2="100" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Bull candle → gap up doji → gap down bearish candle. Buyers reached exhaustion, and the doji at the top is completely isolated from both sides. Bears stepped in hard, leaving bulls abandoned at the top.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 19: RISING / FALLING THREE
+═══════════════════════════════════════════════════════════ -->
+<section id="rising-falling">
+  <div class="section-num">19 / THREE+ CANDLE</div>
+  <h2>Rising &amp; Falling Three Methods</h2>
+  <p class="section-intro">Continuation patterns. A strong directional candle, followed by 2–3 small counter-trend candles that stay within the range of the first, then a final candle that continues the original direction.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:680px; margin:28px 0;">
+    <div style="background:var(--bg3); border:1px solid rgba(38,166,154,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Rising Three Methods</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bull);margin-bottom:14px;">BULLISH CONTINUATION</div>
+      <svg width="130" height="100" viewBox="0 0 130 100" style="margin-bottom:14px;">
+        <!-- Long bull -->
+        <rect x="5" y="20" width="18" height="65" rx="2" fill="#26a69a" opacity="0.9"/>
+        <!-- 3 small bears inside the range -->
+        <rect x="28" y="48" width="12" height="16" rx="1" fill="#ef5350" opacity="0.7"/>
+        <rect x="44" y="44" width="12" height="16" rx="1" fill="#ef5350" opacity="0.7"/>
+        <rect x="60" y="40" width="12" height="16" rx="1" fill="#ef5350" opacity="0.7"/>
+        <!-- Final long bull -->
+        <rect x="78" y="8" width="18" height="70" rx="2" fill="#26a69a" opacity="0.95"/>
+        <line x1="87" y1="4" x2="87" y2="8" stroke="#26a69a" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);">Large bull → 2–4 small counter-trend bears → large bull that closes above Day 1's high. The small pullback candles represent consolidation, not reversal. Bulls are merely resting before continuing.</div>
+    </div>
+    <div style="background:var(--bg3); border:1px solid rgba(239,83,80,0.3); border-radius:10px; padding:20px;">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:4px;">Falling Three Methods</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--bear);margin-bottom:14px;">BEARISH CONTINUATION</div>
+      <svg width="130" height="100" viewBox="0 0 130 100" style="margin-bottom:14px;">
+        <rect x="5" y="15" width="18" height="65" rx="2" fill="#ef5350" opacity="0.9"/>
+        <rect x="28" y="36" width="12" height="16" rx="1" fill="#26a69a" opacity="0.7"/>
+        <rect x="44" y="40" width="12" height="16" rx="1" fill="#26a69a" opacity="0.7"/>
+        <rect x="60" y="44" width="12" height="16" rx="1" fill="#26a69a" opacity="0.7"/>
+        <rect x="78" y="20" width="18" height="72" rx="2" fill="#ef5350" opacity="0.95"/>
+        <line x1="87" y1="92" x2="87" y2="97" stroke="#ef5350" stroke-width="1.5"/>
+      </svg>
+      <div style="font-size:13px;color:var(--text2);">Large bear → 2–4 small counter-trend bulls → large bear that closes below Day 1's low. The brief pullback is a bear flag in candlestick form. Sellers are taking a brief pause, not losing control.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 20: MARKET PSYCHOLOGY
+═══════════════════════════════════════════════════════════ -->
+<section id="psychology">
+  <div class="section-num">20 / ADVANCED</div>
+  <h2>Market Psychology</h2>
+  <p class="section-intro">Every candlestick pattern is a behavioral fingerprint — a record of collective human decision-making under uncertainty. Understanding the psychology makes the patterns unforgettable.</p>
+
+  <h3>The Fear-Greed Cycle</h3>
+  <p>Candlestick patterns are best understood as visual representations of the ongoing battle between fear (bearish pressure) and greed (bullish pressure). The real body shows who won that particular battle; the shadows show how hard the loser fought.</p>
+
+  <div class="context-grid" style="grid-template-columns:1fr 1fr; max-width:640px;">
+    <div class="context-card">
+      <div class="context-card-title" style="color:var(--bull);">Long Bodies</div>
+      <div class="context-card-text">One side maintained control through the entire session. No meaningful resistance encountered. Momentum is strong. These candles belong in the trend direction.</div>
+    </div>
+    <div class="context-card">
+      <div class="context-card-title" style="color:var(--bear);">Long Shadows</div>
+      <div class="context-card-text">The losing side fought hard. An extreme was reached and then forcefully rejected. Long shadows at key levels are among the most reliable signals because they show active defense.</div>
+    </div>
+    <div class="context-card">
+      <div class="context-card-title" style="color:var(--neutral);">Small Bodies</div>
+      <div class="context-card-text">Neither side could sustain an advantage. Often precedes a large directional move as the market resolves its indecision. Watch these closely at critical levels.</div>
+    </div>
+    <div class="context-card">
+      <div class="context-card-title" style="color:var(--accent);">Gaps</div>
+      <div class="context-card-text">Gaps between candles reflect overnight sentiment shifts — news, earnings, macro events. Gaps that fail to fill (confirmed gaps) are some of the most important technical events on a chart.</div>
+    </div>
+  </div>
+
+  <h3>Why Reversals Require Prior Trends</h3>
+  <p>A hammer at the bottom of a 3-day decline is meaningless. The same hammer after a 6-month downtrend at a major support level is highly significant. This is not arbitrary — it reflects the accumulating pressure of trapped traders. The longer and sharper the trend, the more short positions have been built (in a downtrend), and the more explosive the potential reversal when those shorts need to cover.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">Nison's Core Teaching</div>
+    <p>Steve Nison emphasized that a "reversal pattern" is more accurately a "trend change pattern." Reversals rarely happen in one day. The pattern signals that psychology is shifting — but the old trend may consolidate, drift sideways, or reverse gradually over multiple candles before the new trend is fully established.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 21: MARKET CONTEXT
+═══════════════════════════════════════════════════════════ -->
+<section id="context">
+  <div class="section-num">21 / ADVANCED</div>
+  <h2>Market Context Framework</h2>
+  <p class="section-intro">No candlestick pattern operates in a vacuum. The CMT program stresses that pattern signals must be evaluated against the backdrop of trend, support/resistance, and volume.</p>
+
+  <h3>The Five-Context Checklist</h3>
+  <p>Before acting on any candlestick signal, CMT practitioners evaluate these five contextual factors:</p>
+
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Factor</th>
+        <th>Bullish Enhancer</th>
+        <th>Signal Weakener</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:var(--text);">1. Prior Trend</strong></td>
+        <td>Extended downtrend (reversal patterns)</td>
+        <td>Sideways market; very short trend</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--text);">2. Location</strong></td>
+        <td>At major support, Fibonacci level, prior high/low</td>
+        <td>Mid-range with no nearby structure</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--text);">3. Volume</strong></td>
+        <td>Higher volume on signal day vs. prior average</td>
+        <td>Lower-than-average volume = weak conviction</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--text);">4. Timeframe</strong></td>
+        <td>Weekly or daily timeframe</td>
+        <td>1–5 minute charts (high noise)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--text);">5. Confirmation</strong></td>
+        <td>Next candle confirms direction</td>
+        <td>Ambiguous follow-through candle</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Support &amp; Resistance Integration</h3>
+  <p>The most powerful candlestick signals occur precisely at significant support and resistance levels. A shooting star at a random price level is weak. A shooting star at a 52-week high that coincides with a round number and a prior pivot is a high-probability short setup.</p>
+
+  <h3>Volume as Confirmation</h3>
+  <p>Volume validates the intention behind a pattern. High volume on a bullish engulfing candle means institutions participated — the move is meaningful. The same pattern on half-average volume might be noise. As a rule: <em>price is the signal, volume is the conviction.</em></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 22: COMBINATIONS WITH INDICATORS
+═══════════════════════════════════════════════════════════ -->
+<section id="combinations">
+  <div class="section-num">22 / ADVANCED</div>
+  <h2>Candlesticks with Technical Indicators</h2>
+  <p class="section-intro">The CMT approach is to use candlestick patterns as entry triggers within a broader technical framework — not as standalone systems.</p>
+
+  <div class="combo-grid">
+    <div class="combo-card">
+      <h4 style="color:var(--bull);">With Moving Averages</h4>
+      <p>A hammer at the 200-day EMA is vastly more significant than a hammer in mid-air. Use the MA as the support/resistance anchor; the candlestick provides the entry timing. Bullish patterns near a rising EMA = continuation; near a declining EMA = potential reversal with higher risk.</p>
+    </div>
+    <div class="combo-card">
+      <h4 style="color:var(--bear);">With RSI</h4>
+      <p>A bearish engulfing pattern on RSI &gt;70 (overbought) is a high-conviction short setup. A hammer on RSI &lt;30 (oversold) reinforces the bullish reversal case. RSI divergence + reversal candle = strongest signal combination.</p>
+    </div>
+    <div class="combo-card">
+      <h4 style="color:var(--accent);">With VWAP (Intraday)</h4>
+      <p>For 0DTE and intraday traders: a bullish engulfing that forms at VWAP support on the first retest of the day is among the highest-probability setups available. VWAP is the institutional reference price — reaction candles there carry extra weight.</p>
+    </div>
+    <div class="combo-card">
+      <h4 style="color:var(--neutral);">With Bollinger Bands</h4>
+      <p>A shooting star at the upper Bollinger Band confirms overextension and seller rejection simultaneously. A hammer at the lower band after the price has walked down the band is a mean-reversion setup with two layers of confirmation.</p>
+    </div>
+    <div class="combo-card">
+      <h4 style="color:var(--bull);">With Fibonacci</h4>
+      <p>The 61.8% retracement is the most powerful Fibonacci level. A bullish reversal pattern (morning star, bullish engulfing) at this level, especially after a sharp decline, has historically high hit rates. The pattern provides the trigger; Fib provides the location confidence.</p>
+    </div>
+    <div class="combo-card">
+      <h4 style="color:var(--bear);">With MACD</h4>
+      <p>A bearish candlestick pattern that coincides with MACD crossing below the signal line creates a multi-system confluence signal. When price action (candlestick) and momentum (MACD) agree on direction, the probability of follow-through significantly increases.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 23: MULTI-TIMEFRAME
+═══════════════════════════════════════════════════════════ -->
+<section id="timeframes">
+  <div class="section-num">23 / ADVANCED</div>
+  <h2>Multi-Timeframe Analysis</h2>
+  <p class="section-intro">The most powerful candlestick setups occur when signals align across multiple timeframes — a technique called Top-Down Analysis or Multiple Time Frame (MTF) confirmation.</p>
+
+  <h3>The Three-Timeframe Rule</h3>
+  <p>CMT practitioners typically analyze three timeframes: a higher timeframe for trend identification, an intermediate timeframe for the pattern signal, and a lower timeframe for entry precision.</p>
+
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Trader Type</th>
+        <th>Higher TF (Trend)</th>
+        <th>Signal TF (Pattern)</th>
+        <th>Entry TF (Timing)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Position Trader</td>
+        <td>Monthly</td>
+        <td>Weekly</td>
+        <td>Daily</td>
+      </tr>
+      <tr>
+        <td>Swing Trader</td>
+        <td>Weekly</td>
+        <td>Daily</td>
+        <td>4-Hour</td>
+      </tr>
+      <tr>
+        <td>Day Trader</td>
+        <td>Daily</td>
+        <td>1-Hour</td>
+        <td>15-Minute</td>
+      </tr>
+      <tr>
+        <td>0DTE / Scalper</td>
+        <td>Daily / 30m</td>
+        <td>5-Minute</td>
+        <td>1-Minute</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-label">Practical Application</div>
+    <p>For 0DTE SPY options trading: confirm the daily trend direction first (above/below key EMAs), then look for the 5-minute setup (EMA crossover retest with a reversal candlestick pattern at VWAP or a key intraday level). The candlestick becomes the trigger within the established context — not the reason to trade.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 24: RISK MANAGEMENT
+═══════════════════════════════════════════════════════════ -->
+<section id="risk">
+  <div class="section-num">24 / ADVANCED</div>
+  <h2>Risk Management</h2>
+  <p class="section-intro">Technical signals without defined risk are just guesses. The CMT framework insists that every pattern-based trade must define entry, stop, and target before execution.</p>
+
+  <div class="risk-grid">
+    <div class="risk-card">
+      <div class="num">1×</div>
+      <div class="label">Minimum R:R Ratio</div>
+      <div class="desc">Never take a candlestick pattern trade with a risk-reward below 1:1. Target minimum 2:1 for single-pattern entries.</div>
+    </div>
+    <div class="risk-card">
+      <div class="num">ATR</div>
+      <div class="label">Stop Placement</div>
+      <div class="desc">Place stops beyond the shadow extremes of the pattern. For a hammer, the stop goes below the lower wick. Use ATR multipliers for volatile instruments.</div>
+    </div>
+    <div class="risk-card">
+      <div class="num">1–2%</div>
+      <div class="label">Max Position Risk</div>
+      <div class="desc">No single candlestick trade should risk more than 1–2% of total capital, regardless of how high-conviction the pattern appears.</div>
+    </div>
+  </div>
+
+  <h3>Stop Loss Placement by Pattern Type</h3>
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Pattern</th>
+        <th>Long Stop Placement</th>
+        <th>Short Stop Placement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Hammer</td>
+        <td>Below lower wick low</td>
+        <td>N/A (bullish signal)</td>
+      </tr>
+      <tr>
+        <td>Shooting Star</td>
+        <td>N/A (bearish signal)</td>
+        <td>Above upper wick high</td>
+      </tr>
+      <tr>
+        <td>Engulfing (Bull)</td>
+        <td>Below engulfing candle low</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>Morning Star</td>
+        <td>Below the star candle low</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>Three Soldiers</td>
+        <td>Below third soldier's low</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>Doji (at resistance)</td>
+        <td>N/A</td>
+        <td>Above doji's upper wick</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 25: COMMON ERRORS
+═══════════════════════════════════════════════════════════ -->
+<section id="common-errors">
+  <div class="section-num">25 / ADVANCED</div>
+  <h2>Common Errors &amp; Pitfalls</h2>
+  <p class="section-intro">CMT practitioners are defined as much by what they avoid as by what they do. These are the most frequent errors in applied candlestick analysis.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:680px;">
+    <div class="callout bear">
+      <div class="callout-label">Error 1 — Pattern Without Trend Context</div>
+      <p>Acting on a "bullish" pattern without confirming you are in a downtrend (for reversals) or uptrend (for continuations). A hammer in a sideways market is statistically no better than a coin flip.</p>
+    </div>
+    <div class="callout bear">
+      <div class="callout-label">Error 2 — Cherry-Picking</div>
+      <p>Seeing a pattern on any chart after the fact is easy — every chart has patterns. The discipline is defining the pattern criteria in advance and only looking for that specific setup in the correct context.</p>
+    </div>
+    <div class="callout bear">
+      <div class="callout-label">Error 3 — No Confirmation Requirement</div>
+      <p>Acting on single-candle signals (especially doji and spinning tops) without waiting for a confirming candle dramatically reduces reliability from ~65% to near coin-flip levels.</p>
+    </div>
+    <div class="callout bear">
+      <div class="callout-label">Error 4 — Ignoring Volume</div>
+      <p>A bullish engulfing on 40% of average volume is a weak signal. The pattern tells you who won the battle; volume tells you how many soldiers were involved. A small battle win is meaningless in a large war.</p>
+    </div>
+    <div class="callout bear">
+      <div class="callout-label">Error 5 — Over-Pattern-ing</div>
+      <p>Forcing patterns onto charts. Not every two-candle sequence is a harami. Not every small-bodied candle is a doji. Apply strict criteria. If you have to talk yourself into it, the pattern isn't there.</p>
+    </div>
+    <div class="callout bear">
+      <div class="callout-label">Error 6 — Higher Timeframe Neglect</div>
+      <p>A bullish pattern on the 5-minute chart against a daily downtrend is trading against the primary force. Always anchor your analysis to the higher timeframe trend. Trade with the tide, not against it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 26: QUIZ
+═══════════════════════════════════════════════════════════ -->
+<section id="quiz">
+  <div class="section-num">26 / KNOWLEDGE CHECK</div>
+  <h2>Pattern Recognition Quiz</h2>
+  <p class="section-intro">Test your understanding of candlestick patterns with these CMT-style questions.</p>
+
+  <div id="quiz-wrap">
+    <div class="quiz-q" id="quiz-question">Loading question...</div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <button class="btn btn-primary" id="quiz-btn" onclick="quizAction()">Answer</button>
+      <div class="quiz-progress" id="quiz-progress">1 / 10</div>
+    </div>
+    <div id="quiz-score" style="display:none;margin-top:20px;text-align:center;">
+      <div style="font-family:var(--serif);font-size:32px;color:var(--accent);" id="score-display"></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px;">FINAL SCORE</div>
+      <button class="btn btn-ghost" style="margin-top:16px;" onclick="resetQuiz()">Retake Quiz</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════ -->
+<script>
+// ─── SCROLL PROGRESS ─────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const progress = (scrollTop / scrollHeight) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+});
+
+// ─── ACTIVE NAV ───────────────────────────────────────────
+const sections = document.querySelectorAll('section[id], div[id="hero"]');
+const navLinks = document.querySelectorAll('#sidenav a');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => link.classList.remove('active'));
+      const active = document.querySelector(`#sidenav a[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// ─── EXPLORER TABS ───────────────────────────────────────
+function showTab(group, id) {
+  // Find the parent explorer
+  const panel = document.getElementById(id);
+  const explorer = panel.closest('#explorer') || panel.parentElement.closest('div');
+  const allPanels = panel.parentElement.querySelectorAll('.explorer-panel');
+  const allTabs = panel.parentElement.querySelectorAll('.explorer-tab');
+  
+  allPanels.forEach(p => p.classList.remove('active'));
+  allTabs.forEach(t => t.classList.remove('active'));
+  panel.classList.add('active');
+  
+  // Find clicked tab
+  const tabs = document.querySelectorAll('.explorer-tab');
+  tabs.forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(id)) {
+      t.classList.add('active');
+    }
+  });
+}
+
+// ─── CANDLE BUILDER ───────────────────────────────────────
+function updateBuilder() {
+  const O = parseInt(document.getElementById('sl-open').value);
+  const C = parseInt(document.getElementById('sl-close').value);
+  const H = Math.max(parseInt(document.getElementById('sl-high').value), O, C);
+  const L = Math.min(parseInt(document.getElementById('sl-low').value), O, C);
+
+  document.getElementById('lbl-open').textContent = O;
+  document.getElementById('lbl-close').textContent = C;
+  document.getElementById('lbl-high').textContent = H;
+  document.getElementById('lbl-low').textContent = L;
+
+  const svg = document.getElementById('builder-svg');
+  const h = 180;
+  const range = H - L || 1;
+
+  const yH = 10 + ((100 - H) / 100) * h;
+  const yL = 10 + ((100 - L) / 100) * h;
+  const yO = 10 + ((100 - O) / 100) * h;
+  const yC = 10 + ((100 - C) / 100) * h;
+
+  const isBull = C >= O;
+  const color = isBull ? '#26a69a' : '#ef5350';
+  const bodyTop = Math.min(yO, yC);
+  const bodyH = Math.max(Math.abs(yO - yC), 2);
+
+  let pattern = 'Standard Candle';
+  let type = isBull ? 'BULLISH' : 'BEARISH';
+  let analysis = '';
+
+  const upperShadow = Math.abs(H - Math.max(O, C));
+  const lowerShadow = Math.abs(Math.min(O, C) - L);
+  const body = Math.abs(O - C);
+
+  if (body < 1) {
+    pattern = 'Doji';
+    type = 'INDECISION';
+    analysis = 'Open ≈ Close. Neither buyers nor sellers could gain a decisive advantage. Context determines if this is a reversal or continuation signal — look at the prior trend and location.';
+  } else if (upperShadow < 1 && lowerShadow < 1) {
+    pattern = isBull ? 'Bullish Marubozu' : 'Bearish Marubozu';
+    analysis = isBull ? 'No shadows — bulls controlled the entire session from open to close. One of the strongest individual bullish candles. Open = Low, Close = High.' : 'No shadows — bears controlled the entire session. Open = High, Close = Low. Extremely bearish signal.';
+  } else if (lowerShadow > body * 2 && upperShadow < body * 0.5) {
+    pattern = isBull ? 'Hammer' : 'Hanging Man';
+    analysis = isBull ? 'Long lower shadow (≥2× body) with small or no upper shadow. In a downtrend: bullish reversal signal (Hammer). In an uptrend: bearish warning (Hanging Man). Requires trend context to interpret correctly.' : 'This shape after an uptrend is a Hanging Man — a bearish warning. Sellers pushed the price down during the session, but buyers recovered. The warning: bears are emerging. Requires bearish confirmation candle.';
+  } else if (upperShadow > body * 2 && lowerShadow < body * 0.5) {
+    pattern = isBull ? 'Inverted Hammer' : 'Shooting Star';
+    analysis = isBull ? 'Long upper shadow with small body at the bottom. In a downtrend: Inverted Hammer — buyers attempted a rally. Needs bullish confirmation candle.' : 'Long upper shadow at the top of the range. In an uptrend: Shooting Star — sellers rejected the advance. A bearish reversal candidate requiring confirmation.';
+  } else if (body < (H - L) * 0.2 && upperShadow > body && lowerShadow > body) {
+    pattern = isBull ? 'Bullish Spinning Top' : 'Bearish Spinning Top';
+    type = 'INDECISION';
+    analysis = 'Small body with long equal shadows — indecision. Neither bulls nor bears could maintain control of the session. Significant only at extremes of a trend; requires confirmation.';
+  } else if (lowerShadow > body * 1.5 && upperShadow > body * 0.5) {
+    pattern = 'High-Wave Candle';
+    type = 'INDECISION';
+    analysis = 'Long shadows on both sides with a visible body. Extreme volatility — both sides fought hard but neither could decisively win. Similar to spinning top, heightened indecision.';
+  }
+
+  svg.innerHTML = `
+    <line x1="50" y1="${yH}" x2="50" y2="${bodyTop}" stroke="${color}" stroke-width="2"/>
+    <rect x="35" y="${bodyTop}" width="30" height="${bodyH}" rx="3" fill="${color}" opacity="0.9"/>
+    <line x1="50" y1="${bodyTop + bodyH}" x2="50" y2="${yL}" stroke="${color}" stroke-width="2"/>
+    <text x="50" y="198" font-family="IBM Plex Mono" font-size="9" fill="#5c5852" text-anchor="middle">O:${O} H:${H} L:${L} C:${C}</text>
+  `;
+
+  document.getElementById('builder-name').textContent = pattern;
+  const typeEl = document.getElementById('builder-type');
+  typeEl.textContent = type;
+  typeEl.style.color = type === 'BULLISH' ? 'var(--bull)' : type === 'BEARISH' ? 'var(--bear)' : 'var(--neutral)';
+  document.getElementById('builder-analysis').innerHTML = `<strong style="color:var(--text)">Analysis:</strong> ${analysis}`;
+}
+
+updateBuilder();
+
+// ─── QUIZ ─────────────────────────────────────────────────
+const quizData = [
+  {
+    q: "A long green candle with no upper or lower shadows is called:",
+    opts: ["Dragonfly Doji", "Bullish Marubozu", "Three White Soldiers", "Bullish Engulfing"],
+    ans: 1,
+    exp: "Bullish Marubozu — 丸坊主 (shaved head) — has no shadows. The open equals the low and the close equals the high. It signals total buyer dominance throughout the session."
+  },
+  {
+    q: "A hammer pattern appears at the bottom of a downtrend. What makes it more significant?",
+    opts: ["A gap down on the following candle", "A confirming bullish candle the next day", "A gap up on the pattern day itself", "A bearish candle before it"],
+    ans: 1,
+    exp: "Confirmation from the next candle is required to validate a hammer. Without it, the signal is unconfirmed. Acting on a hammer without confirmation significantly reduces reliability."
+  },
+  {
+    q: "The Morning Star pattern requires how many candles?",
+    opts: ["1", "2", "3", "5"],
+    ans: 2,
+    exp: "Morning Star is a three-candle pattern: (1) a large bearish candle, (2) a small-bodied or doji 'star' that ideally gaps down, and (3) a large bullish candle that closes into the first candle's body."
+  },
+  {
+    q: "Which doji type signals the strongest bullish reversal potential at support?",
+    opts: ["Standard Doji", "Long-Legged Doji", "Gravestone Doji", "Dragonfly Doji"],
+    ans: 3,
+    exp: "Dragonfly Doji — open, high, and close are all at the top with a long lower shadow. Sellers pushed price aggressively lower but buyers absorbed everything and closed near the high. Strongest bullish doji at support."
+  },
+  {
+    q: "In a Bullish Engulfing pattern, the second candle must:",
+    opts: ["Open above the first candle's open", "Close above the first candle's open", "Have no upper shadow", "Gap up from the prior close"],
+    ans: 1,
+    exp: "The engulfing candle must open below the first candle's close AND close above the first candle's open — completely engulfing the body of the prior candle. Shadows are not required to engulf."
+  },
+  {
+    q: "A Hanging Man pattern is bearish because:",
+    opts: ["It has a red body", "It appears at the top of an uptrend and shows sellers entered during the session", "It has no upper shadow", "It engulfs the prior candle"],
+    ans: 1,
+    exp: "The Hanging Man is bearish not because of its color but because of its location (top of an uptrend) and the message of its long lower shadow — sellers pushed price sharply lower during the session, warning that bears are emerging."
+  },
+  {
+    q: "What is the key validation rule for a Piercing Line pattern?",
+    opts: ["The second candle must open below the first candle's low", "The second candle must close above the midpoint of the first candle's body", "The two candles must be equal in size", "Volume must double"],
+    ans: 1,
+    exp: "The Piercing Line requires the bullish second candle to close above the 50% (midpoint) level of the prior bearish candle's body. If it closes below the midpoint, the pattern is invalid — no reversal signal."
+  },
+  {
+    q: "Three Black Crows most reliably signals:",
+    opts: ["A bullish continuation", "A bearish reversal or strong continuation of a downtrend", "Market indecision", "A temporary pullback in an uptrend"],
+    ans: 1,
+    exp: "Three Black Crows — three consecutive long bearish candles each closing lower — represents sustained, organized selling pressure. It is a strong bearish signal, most powerful when it appears after an uptrend at resistance."
+  },
+  {
+    q: "Why is the Abandoned Baby considered so powerful?",
+    opts: ["It uses five candles", "The middle doji is gapped from BOTH adjacent candles, showing complete isolation of indecision", "It always appears at the exact market bottom", "It requires high volume to form"],
+    ans: 1,
+    exp: "The Abandoned Baby's power comes from the complete gap isolation of the middle doji from both the preceding and following candles. This means there is zero overlap — the market completely abandoned the prior direction and reversed with conviction."
+  },
+  {
+    q: "For a 0DTE trader using 5-minute charts, which additional context most improves candlestick pattern reliability?",
+    opts: ["News headlines", "Alignment with the daily trend and reaction at VWAP", "The prior week's pattern", "The number of contracts traded at that level"],
+    ans: 1,
+    exp: "For intraday/0DTE trading, the strongest candlestick setups occur when the pattern aligns with the higher-timeframe (daily) trend direction and forms at a key reference price like VWAP or a major intraday support/resistance level. This multi-layer confluence is what separates high-probability setups from noise."
+  }
+];
+
+let qIdx = 0, score = 0, answered = false;
+
+function loadQuestion() {
+  const q = quizData[qIdx];
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-progress').textContent = `${qIdx + 1} / ${quizData.length}`;
+  document.getElementById('quiz-feedback').style.display = 'none';
+  document.getElementById('quiz-btn').textContent = 'Submit';
+  answered = false;
+
+  const optsDiv = document.getElementById('quiz-options');
+  optsDiv.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => selectOpt(i, btn);
+    optsDiv.appendChild(btn);
+  });
+}
+
+let selectedIdx = -1;
+
+function selectOpt(i, btn) {
+  if (answered) return;
+  document.querySelectorAll('.quiz-opt').forEach(b => b.style.outline = 'none');
+  btn.style.outline = '2px solid var(--accent)';
+  selectedIdx = i;
+}
+
+function quizAction() {
+  if (!answered) {
+    if (selectedIdx === -1) return;
+    const q = quizData[qIdx];
+    const opts = document.querySelectorAll('.quiz-opt');
+    opts[q.ans].classList.add('correct');
+    if (selectedIdx !== q.ans) {
+      opts[selectedIdx].classList.add('wrong');
+    } else {
+      score++;
+    }
+    opts.forEach(b => b.style.outline = 'none');
+    document.getElementById('quiz-feedback').style.display = 'block';
+    document.getElementById('quiz-feedback').textContent = q.exp;
+    document.getElementById('quiz-btn').textContent = qIdx < quizData.length - 1 ? 'Next Question →' : 'See Results';
+    answered = true;
+  } else {
+    qIdx++;
+    selectedIdx = -1;
+    if (qIdx < quizData.length) {
+      loadQuestion();
+    } else {
+      document.getElementById('quiz-question').style.display = 'none';
+      document.getElementById('quiz-options').style.display = 'none';
+      document.getElementById('quiz-feedback').style.display = 'none';
+      document.getElementById('quiz-btn').style.display = 'none';
+      document.getElementById('quiz-progress').style.display = 'none';
+      document.getElementById('quiz-score').style.display = 'block';
+      const pct = Math.round((score / quizData.length) * 100);
+      let grade = pct >= 90 ? '🏆 CMT Ready' : pct >= 70 ? '📈 Solid Foundation' : '📚 Keep Studying';
+      document.getElementById('score-display').innerHTML = `${score} / ${quizData.length} &nbsp;·&nbsp; ${pct}%<br><span style="font-size:18px;font-family:var(--mono);color:var(--text2)">${grade}</span>`;
+    }
+  }
+}
+
+function resetQuiz() {
+  qIdx = 0; score = 0; answered = false; selectedIdx = -1;
+  document.getElementById('quiz-question').style.display = 'block';
+  document.getElementById('quiz-options').style.display = 'flex';
+  document.getElementById('quiz-btn').style.display = 'inline-block';
+  document.getElementById('quiz-progress').style.display = 'block';
+  document.getElementById('quiz-score').style.display = 'none';
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
